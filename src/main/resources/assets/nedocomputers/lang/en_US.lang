@@ -1,0 +1,6 @@
+tile.nedocomputers.CPU.name=CPU
+tile.nedocomputers.display.name=Display
+tile.nedocomputers.cable.name=Peripheral Cable
+tile.nedocomputers.IOExpander.name=IO Expander
+item.nedocomputers.EEPROM.name=EEPROM (empty)
+item.nedocomputers.ForthROM.name=NedoForth v0.1

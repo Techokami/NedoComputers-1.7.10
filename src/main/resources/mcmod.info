@@ -1,0 +1,19 @@
+[
+{
+  "modid": "nedocomputers",
+  "name": "NedoComputers",
+  "description": "",
+  "version": "${version}",
+  "mcversion": "${mcversion}",
+  "url": "",
+  "updateUrl": "",
+  "authors": [
+    " "
+  ],
+  "credits": "",
+  "logoFile": "",
+  "screenshots": [],
+  "parent": "",
+  "dependencies": []
+}
+]
