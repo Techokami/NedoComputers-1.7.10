@@ -26,6 +26,7 @@ public class GuiDisplay extends GuiContainer {
 	private static int monitor_screen_height = 600;
 
 	final private ResourceLocation charset_loc = new ResourceLocation("nedocomputers", "textures/gui/charset.png");
+	final private ResourceLocation display_loc = new ResourceLocation("nedocomputers", "textures/gui/display.png");
 
 	public GuiDisplay(TileEntityCPU te) {
 		super(new ContainerDisplay(te));
@@ -43,43 +44,53 @@ public class GuiDisplay extends GuiContainer {
 	}
 	
 	@Override
-    public void drawScreen(int par1, int par2, float par3) {
-    	byte[] video_ram = tile.video_ram;
-    	int first_line = video_ram[0x2600];
-    	int cursor_x = video_ram[0x2602];
-    	int cursor_y = video_ram[0x2604];
-    	
-    	drawDefaultBackground();
-    	ScaledResolution scaledresolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
-    	int scaleFactor = scaledresolution.getScaleFactor();
-    	GL11.glScaled(1.0D/(double)scaleFactor, 1.0D/(double)scaleFactor, 0.0D);
-    	
-    	drawRect((mc.displayWidth / 2) - (monitor_screen_width / 2) - 20,
-    			(mc.displayHeight / 2) - (monitor_screen_height / 2) - 20,
-    			(mc.displayWidth / 2) + (monitor_screen_width / 2) + 20,
-    			(mc.displayHeight / 2) + (monitor_screen_height / 2) + 20,
-    			0xFF888888);
+	public void drawScreen(int par1, int par2, float par3) {
+		byte[] video_ram = tile.video_ram;
+		int first_line = video_ram[0x2600];
+		int cursor_x = video_ram[0x2602];
+		int cursor_y = video_ram[0x2604];
+		
+		drawDefaultBackground();
+		ScaledResolution scaledresolution = new ScaledResolution(mc, mc.displayWidth, mc.displayHeight);
+		int scaleFactor = scaledresolution.getScaleFactor();
+		
+		/*drawRect((mc.displayWidth / 2) - (monitor_screen_width / 2) - 20,
+				(mc.displayHeight / 2) - (monitor_screen_height / 2) - 20,
+				(mc.displayWidth / 2) + (monitor_screen_width / 2) + 20,
+				(mc.displayHeight / 2) + (monitor_screen_height / 2) + 20,
+				0xFF888888);*/
+		
+		int cx = (mc.displayWidth / 2) - (monitor_screen_width / 2);
+		int cy = (mc.displayHeight / 2) - (monitor_screen_height / 2);
+		
+		GL11.glColor3f(1.0F, 1.0F, 1.0F);
+		GL11.glScalef(4.0F/(float)scaleFactor, 4.0F/(float)scaleFactor, 0.0F);
+		mc.renderEngine.bindTexture(display_loc);
+		drawTexturedModalRect(cx / 4 - 8,
+				cy / 4 - 8,
+				0, 0, 256, 256);
+		
+		GL11.glScalef(0.25F, 0.25F, 0.0F);
+		
+		mc.renderEngine.bindTexture(charset_loc);
+		int line = first_line;
+		for (int j = 0; j < 75; j++) {
+			for (int i = 0; i < 100; i++) {
+				int x = i * 8 + (cx / 4) * 4;
+				int y = j * 8 + (cy / 4) * 4;
+				int chr = ((int)video_ram[line * 128 + i]) & 0xFF;
+				drawTexturedModalRect(x, y, (chr & 0x0F) * 8, (chr / 16) * 8, 8, 8);
+			}
+			line = (line + 1) % 75;
+		}
 
-    	GL11.glColor3f(1.0F, 1.0F, 1.0F);
-    	mc.renderEngine.bindTexture(charset_loc);
-    	int line = first_line;
-    	for (int j = 0; j < 75; j++) {
-    		for (int i = 0; i < 100; i++) {
-    			int x = i * 8 + (mc.displayWidth / 2) - (monitor_screen_width / 2);
-    			int y = j * 8 + (mc.displayHeight / 2) - (monitor_screen_height / 2);
-    			int chr = ((int)video_ram[line * 128 + i]) & 0xFF;
-    			drawTexturedModalRect(x, y, (chr & 0x0F) * 8, (chr / 16) * 8, 8, 8);
-    		}
-    		line = (line + 1) % 75;
-    	}
-
-    	if ((Minecraft.getSystemTime() % 700) < 350 /* && tile.isTurnOn */) {
-			int x = cursor_x * 8 + (mc.displayWidth / 2) - (monitor_screen_width / 2);
-			int y = cursor_y * 8 + (mc.displayHeight / 2) - (monitor_screen_height / 2);
+		if ((Minecraft.getSystemTime() % 700) < 350) {
+			int x = cursor_x * 8 + (cx / 4) * 4;
+			int y = cursor_y * 8 + (cy / 4) * 4;
 			int chr = ((((int)video_ram[((cursor_y + first_line) % 75) * 128 + cursor_x]) & 0xFF) ^ 128);
-    		drawTexturedModalRect(x, y, (chr & 0x0F) * 8, (chr / 16) * 8, 8, 8);
-    	}
-    }
+			drawTexturedModalRect(x, y, (chr & 0x0F) * 8, (chr / 16) * 8, 8, 8);
+		}
+	}
 	
 	@Override
 	protected void keyTyped(char chr, int scancode) {
@@ -98,9 +109,9 @@ public class GuiDisplay extends GuiContainer {
 	}
 	
 	@Override
-    public boolean doesGuiPauseGame() {
-        return false;
-    }
+	public boolean doesGuiPauseGame() {
+		return false;
+	}
 	
 	protected byte to_ascii(char chr, int scancode) {
 		switch (scancode) {
